@@ -8,6 +8,7 @@ import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -20,27 +21,36 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class HellobootApplication {
-	public static void main(String[] args) {
-		ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
-		WebServer webServer = serverFactory.getWebServer(servletContext -> {
-			servletContext.addServlet("HelloServlet", new HttpServlet() {
-				@Override
-				// 여기서 요청, 응답 만듬
-				protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-					// request
-					String name = req.getParameter("name");
+    public static void main(String[] args) {
+        ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
+        WebServer webServer = serverFactory.getWebServer(servletContext -> {
+            HelloController helloController = new HelloController();
+            servletContext.addServlet("FrontController", new HttpServlet() {
+                @Override
+                // 여기서 요청, 응답 조작
+                protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    if (req.getRequestURI().equals("/hello") && req.getMethod().equals(HttpMethod.GET.name())) {
+                        // request
+                        String name = req.getParameter("name");
+                        String ret = helloController.hello(name);
+
+                        // response
+                        resp.setStatus(HttpStatus.OK.value());
+                        resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
+                        resp.addHeader("Custom-Header", "Custom");
+                        resp.getWriter().println(ret);
+                    } else if (req.getRequestURI().equals("users")) {
+                        resp.getWriter().println("this is users block");
+                    } else if (req.getRequestURI().equals("security")) {
+                        resp.getWriter().println("this is security block");
+                    } else {
+                        resp.setStatus(HttpStatus.NO_CONTENT.value());
+                    }
+                }
+            }).addMapping("/*");
 
 
-					// response
-					resp.setStatus(HttpStatus.OK.value());
-					resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
-//					resp.addHeader("Custom-Header", "Custom");
-					resp.getWriter().println("Hello Servlet from Writer " + name);
-				}
-			}).addMapping("/hello");
-
-
-		});
-		webServer.start();
-	}
+        });
+        webServer.start();
+    }
 }
