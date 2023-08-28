@@ -7,6 +7,9 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -22,12 +25,17 @@ public class HellobootApplication {
 		WebServer webServer = serverFactory.getWebServer(servletContext -> {
 			servletContext.addServlet("HelloServlet", new HttpServlet() {
 				@Override
-				// 여기서 응답 만듬
+				// 여기서 요청, 응답 만듬
 				protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-					resp.setStatus(200);
-					resp.setHeader("Content-Type", "text/plain");
-					resp.addHeader("Custom-Header", "Custom");
-					resp.getWriter().println("Hello Servlet from Writer");
+					// request
+					String name = req.getParameter("name");
+
+
+					// response
+					resp.setStatus(HttpStatus.OK.value());
+					resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
+//					resp.addHeader("Custom-Header", "Custom");
+					resp.getWriter().println("Hello Servlet from Writer " + name);
 				}
 			}).addMapping("/hello");
 
