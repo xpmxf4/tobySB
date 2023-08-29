@@ -12,6 +12,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.context.support.GenericWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -23,36 +25,20 @@ import java.io.PrintWriter;
 
 public class HellobootApplication {
     public static void main(String[] args) {
-        GenericApplicationContext applicationContext = new GenericApplicationContext();
+        // Spring Container 및 Bean 등록
+        GenericWebApplicationContext applicationContext = new GenericWebApplicationContext();
         applicationContext.registerBean(HelloController.class);
         applicationContext.registerBean(SimpleHelloService.class);
 //        applicationContext.registerBean(ComplexHelloService.class);
         applicationContext.refresh();
 
 
+        // Servlet Container 등록
         ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
         WebServer webServer = serverFactory.getWebServer(servletContext -> {
-            servletContext.addServlet("FrontController", new HttpServlet() {
-                @Override
-                // 여기서 요청, 응답 조작
-                protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                    if (req.getRequestURI().equals("/hello") && req.getMethod().equals(HttpMethod.GET.name())) {
-                        // request
-                        String name = req.getParameter("name");
-
-                        HelloController helloController = applicationContext.getBean(HelloController.class);
-                        String ret = helloController.hello(name);
-
-                        // response
-                        resp.setContentType(MediaType.TEXT_PLAIN_VALUE);
-                        resp.getWriter().println(ret);
-                    } else {
-                        resp.setStatus(HttpStatus.NO_CONTENT.value());
-                    }
-                }
-            }).addMapping("/*");
-
-
+            servletContext.addServlet("dispatcherServlet",
+                    new DispatcherServlet(applicationContext)
+            ).addMapping("/*");
         });
         webServer.start();
     }
