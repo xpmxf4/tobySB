@@ -7,6 +7,7 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -22,9 +23,15 @@ import java.io.PrintWriter;
 
 public class HellobootApplication {
     public static void main(String[] args) {
+        GenericApplicationContext applicationContext = new GenericApplicationContext();
+        applicationContext.registerBean(HelloController.class);
+        applicationContext.registerBean(SimpleHelloService.class);
+//        applicationContext.registerBean(ComplexHelloService.class);
+        applicationContext.refresh();
+
+
         ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
         WebServer webServer = serverFactory.getWebServer(servletContext -> {
-            HelloController helloController = new HelloController();
             servletContext.addServlet("FrontController", new HttpServlet() {
                 @Override
                 // 여기서 요청, 응답 조작
@@ -32,17 +39,13 @@ public class HellobootApplication {
                     if (req.getRequestURI().equals("/hello") && req.getMethod().equals(HttpMethod.GET.name())) {
                         // request
                         String name = req.getParameter("name");
+
+                        HelloController helloController = applicationContext.getBean(HelloController.class);
                         String ret = helloController.hello(name);
 
                         // response
-                        resp.setStatus(HttpStatus.OK.value());
-                        resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
-                        resp.addHeader("Custom-Header", "Custom");
+                        resp.setContentType(MediaType.TEXT_PLAIN_VALUE);
                         resp.getWriter().println(ret);
-                    } else if (req.getRequestURI().equals("users")) {
-                        resp.getWriter().println("this is users block");
-                    } else if (req.getRequestURI().equals("security")) {
-                        resp.getWriter().println("this is security block");
                     } else {
                         resp.setStatus(HttpStatus.NO_CONTENT.value());
                     }
