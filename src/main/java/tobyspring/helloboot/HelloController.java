@@ -10,13 +10,17 @@ import java.util.Objects;
 @RestController
 public class HelloController {
     private final HelloService helloService;
-    private final ApplicationContext applicationContext;
+//    private final ApplicationContext applicationContext;
 
-    public HelloController(HelloService helloService, ApplicationContext applicationContext) {
+//    public HelloController(HelloService helloService, ApplicationContext applicationContext) {
+//        this.helloService = helloService;
+//        this.applicationContext = applicationContext;
+//
+//        System.out.println("==========================="+applicationContext);
+//    }
+
+    public HelloController(HelloService helloService) {
         this.helloService = helloService;
-        this.applicationContext = applicationContext;
-
-        System.out.println("==========================="+applicationContext);
     }
 
     // GET + URL : /hello
@@ -25,6 +29,11 @@ public class HelloController {
 //    중요한 건, 각각의 애너테이션에 따라 생략이 되더라도, 해당 정보가 필요하다는 것을 기억하자!!
 //    @RequestMapping(value = "/hello", method = RequestMethod.GET)
     public String hello(String name) {
-        return helloService.sayHello(Objects.requireNonNull(name));
+//        return helloService.sayHello(Objects.requireNonNull(name));
+        if (name == null || name.trim().equals("")) {
+            throw new IllegalStateException();
+        }
+
+        return helloService.sayHello(name);
     }
 }
