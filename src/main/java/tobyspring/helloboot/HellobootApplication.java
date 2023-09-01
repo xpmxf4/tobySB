@@ -16,6 +16,16 @@ import org.springframework.web.servlet.DispatcherServlet;
 @Configuration
 @ComponentScan
 public class HellobootApplication {
+    @Bean
+    public ServletWebServerFactory servletWebServerFactory() {
+        return new TomcatServletWebServerFactory();
+    }
+
+    @Bean
+    public DispatcherServlet dispatcherServlet() {
+        return new DispatcherServlet();
+    }
+
     public static void main(String[] args) {
         // Spring Container 생성 및 Bean 등록, 초기화
         AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext() {
@@ -24,12 +34,15 @@ public class HellobootApplication {
                 super.onRefresh();
 
                 // Servlet Container 생성, DispatcherServlet 초기화
-                ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
+                ServletWebServerFactory serverFactory = this.getBean(ServletWebServerFactory.class);
+                DispatcherServlet dispatcherServlet = this.getBean(DispatcherServlet.class);
+//                dispatcherServlet.setApplicationContext(this);
+
                 WebServer webServer = serverFactory.getWebServer(servletContext -> {
-                    servletContext.addServlet("dispatcherServlet",
-                            new DispatcherServlet(this)
-                    ).addMapping("/*");
+                    servletContext.addServlet("dispatcherServlet", dispatcherServlet)
+                            .addMapping("/*");
                 });
+
                 webServer.start();
             }
         };
