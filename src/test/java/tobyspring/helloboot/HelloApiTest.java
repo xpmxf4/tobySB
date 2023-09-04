@@ -20,7 +20,7 @@ public class HelloApiTest {
 
         assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(res.getHeaders().getFirst("Content-Type")).startsWith(MediaType.TEXT_PLAIN_VALUE);
-        assertThat(res.getBody()).isEqualTo("Hello Spring Boot");
+        assertThat(res.getBody()).isEqualTo("*Hello Spring Boot*");
     }
 
     @Test
