@@ -31,7 +31,7 @@ public class HelloController {
     public String hello(String name) {
 //        return helloService.sayHello(Objects.requireNonNull(name));
         if (name == null || name.trim().equals("")) {
-            throw new IllegalStateException();
+            throw new IllegalArgumentException();
         }
 
         return helloService.sayHello(name);
