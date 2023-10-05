@@ -1,18 +1,14 @@
 package tobyspring.helloboot;
 
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Objects;
 
 @RestController
 public class HelloController {
     private final HelloService helloService;
 
-    public HelloController(HelloService helloService) {
-        this.helloService = helloService;
+    public HelloController(HelloService helloProxy) {
+        System.out.println("==========================HelloController : helloService.getClass() = " + helloProxy.getClass());
+        this.helloService = helloProxy;
     }
 
     // GET + URL : /hello
