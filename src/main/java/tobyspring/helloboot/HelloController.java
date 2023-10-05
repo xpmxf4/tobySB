@@ -10,14 +10,6 @@ import java.util.Objects;
 @RestController
 public class HelloController {
     private final HelloService helloService;
-//    private final ApplicationContext applicationContext;
-
-//    public HelloController(HelloService helloService, ApplicationContext applicationContext) {
-//        this.helloService = helloService;
-//        this.applicationContext = applicationContext;
-//
-//        System.out.println("==========================="+applicationContext);
-//    }
 
     public HelloController(HelloService helloService) {
         this.helloService = helloService;
