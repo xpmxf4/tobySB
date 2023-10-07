@@ -12,6 +12,7 @@ public class HelloDecorator implements HelloService {
 
     @Override
     public String sayHello(String name) {
+        System.out.println("============================================="+"sayHello() in HelloDecorator");
         return "*" + helloService.sayHello(name) + "*";
     }
 }
