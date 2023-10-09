@@ -14,7 +14,7 @@ public class HelloConfig {
 
     @Bean
     public HelloService helloDecorator(HelloService simpleHelloService) {
-        System.out.println("=============================================HelloConfig.helloDecorator()");
+        System.out.println("============================================HelloConfig.helloDecorator()");
         return new HelloDecorator(simpleHelloService);
     }
 
